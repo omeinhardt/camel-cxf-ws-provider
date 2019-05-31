@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://example.camel.softceed.de/fromexternal"
+  xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://example.camel.softceed.de/fromexternal">
+
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:import namespace="http://example.camel.softceed.de/fromexternal" schemaLocation="wsProvider.xsd" />
+    </xsd:schema>
+  </wsdl:types>
+
+
+  <wsdl:message name="inputExampleRequest">
+    <wsdl:part element="tns:ExampleRequest" name="ExampleRequest" />
+  </wsdl:message>
+  <wsdl:message name="outputExampleRequest">
+    <wsdl:part element="tns:SyncResponse" name="SyncResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="requestFault">
+    <wsdl:part element="tns:RequestFault" name="RequestFault" />
+  </wsdl:message>
+
+  <wsdl:portType name="ExampleRequestEndpoint">
+    <wsdl:operation name="create">
+      <wsdl:documentation>Create new example</wsdl:documentation>
+      <wsdl:input message="tns:inputExampleRequest" />
+      <wsdl:output message="tns:outputExampleRequest" />
+      <wsdl:fault message="tns:requestFault" name="requestFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="ExampleRequestBinding" type="tns:ExampleRequestEndpoint">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="create">
+      <soap:operation soapAction="http://example.camel.softceed.de/Example" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ExampleRequestEndpointService">
+    <wsdl:port name="ExampleRequestService" binding="tns:ExampleRequestBinding">
+      <soap:address location="http://localhost:7500/wsprovider/requests" />
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>
+

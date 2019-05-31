@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camel="http://camel.apache.org/schema/spring"
+  xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://camel.apache.org/schema/spring
+         http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <!-- CXF endpoint definitions: -->
+  <import resource="wsprovider-camel-cxf.xml" />
+
+  <!-- Definition of beans: -->
+  <bean id="messageProcessor" class="de.softceed.camel.example.fromexternal.WsMessageProcessor">
+  </bean>
+
+  <!-- JAXB data format for processing service requests (from external) -->
+  <bean id="requestMessage" class="org.apache.camel.model.dataformat.JaxbDataFormat">
+    <property name="prettyPrint" value="true" />
+    <property name="contextPath" value="de.softceed.camel.example.fromexternal" />
+  </bean>
+
+
+  <!-- Apache Camel context and routes -->
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+
+    <!-- Endpoints for routes -->
+    <endpoint id="wsInputEndpoint" uri="cxf:bean:exampleRequestEndpoint" />
+    <endpoint id="xsdValidatorEndpoint" uri="validator:wsdl/wsProvider.xsd" />
+    <endpoint id="asynchProcessingEndpoint" uri="seda:asynchProcessing?waitForTaskToComplete=Never" />
+
+    <!-- Global exception handling -->
+    <onException>
+      <exception>java.lang.Exception</exception>
+      <handled>
+        <constant>true</constant>
+      </handled>
+      <log message="Error in request processing:" />
+      <log message="${exception.stacktrace}" />
+    </onException>
+
+    <!-- Incoming external web service requests -->
+    <route id="fromExternalRoute">
+      <!-- Route starts from the CXF webservice, see wsProvider-camel-cxf.xml for details -->
+      <from uri="wsInputEndpoint" />
+
+      <!-- Get request data for validation and further processing -->
+      <bean ref="messageProcessor" method="getSoapRequest" />
+      <unmarshal ref="requestMessage" />
+
+      <!-- Schema validation, no extra checking of message type necessary because only operations defined in web service 
+        are possible -->
+      <to uri="xsdValidatorEndpoint" />
+
+      <!-- validate request data -->
+      <bean ref="messageProcessor" method="validateSoapRequest" />
+
+      <!-- Further, asynchronous processing -->
+      <to uri="asynchProcessingEndpoint" />
+
+      <!-- synchronous acknowledgment -->
+      <bean ref="messageProcessor" method="getSyncSoapResponse" />
+    </route>
+
+
+    <route id="asynchronousFromExternalRoute">
+      <!-- Asynchronous web service request processing -->
+      <from uri="asynchProcessingEndpoint" />
+      <setExchangePattern pattern="InOnly" />
+      <onException useOriginalMessage="true">
+        <exception>java.lang.Exception</exception>
+        <handled>
+          <constant>true</constant>
+        </handled>
+        <log message="Error in asynchronous request processing:" />
+        <log message="${exception.stacktrace}" />
+      </onException>
+
+      <log message="Do further processing, send message to other endpoint..." />
+    </route>
+
+  </camelContext>
+
+</beans>
+

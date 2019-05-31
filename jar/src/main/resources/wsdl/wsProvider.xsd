@@ -1,0 +1,60 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:eb="http://example.camel.softceed.de/fromexternal"
+  xmlns:xmime="http://www.w3.org/2005/05/xmlmime" elementFormDefault="qualified" targetNamespace="http://example.camel.softceed.de/fromexternal">
+
+  <xsd:element name="ExampleRequest">
+    <xsd:annotation>
+      <xsd:documentation>Type for "example request"</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="ExampleRequestOperationData" type="eb:ExampleRequestOperationData" />
+        <xsd:element name="ExampleRequestInfo" type="eb:ExampleRequestInfo" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="SyncResponse">
+    <xsd:annotation>
+      <xsd:documentation>Type for synchronous response information</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Result" type="xsd:string" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="RequestFault">
+    <xsd:annotation>
+      <xsd:documentation>Type for information about failed request</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="ErrorCode" type="xsd:string" />
+        <xsd:element name="ErrorMessage" type="xsd:string" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="ExampleRequestOperationData">
+    <xsd:annotation>
+      <xsd:documentation>Common information about requested operation</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="MessageId" type="xsd:string" />
+      <xsd:element name="Timestamp" type="xsd:dateTime" minOccurs="0" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ExampleRequestInfo">
+    <xsd:annotation>
+      <xsd:documentation>Special request information</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="RequestId" type="xsd:string" />
+      <xsd:element name="Title" type="xsd:string" minOccurs="0" />
+      <xsd:element name="Description" type="xsd:string" minOccurs="0" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

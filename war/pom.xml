@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>wsProvider</artifactId>
+    <groupId>de.softceed.camel.example</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>wsProvider-war</artifactId>
+  <packaging>war</packaging>
+  <name>wsProvider-war</name>
+  <description>Project for war artefact of wsProvider</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.softceed.camel.example</groupId>
+      <artifactId>wsProvider-jar</artifactId>
+      <version>${wsProvider-version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-cxf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-spring-ws</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp</directory>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
+          <attachClasses>true</attachClasses>
+          <packagingExcludes>%regex[WEB-INF/lib/(?!wsProvider*)(?!standard*).*.jar]</packagingExcludes>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>lib/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+    <!-- Name of the generated WAR file -->
+    <finalName>wsProvider-WebService</finalName>
+  </build>
+
+</project>
